@@ -4,4 +4,6 @@ redis
 requests
 xmltodict
 geopy
+pytest==7.3.1
+
 

@@ -90,12 +90,37 @@ To run flask app in back with 5000 port:
 docker-compose up --build -d (to build the dockerfile)
 
 What route codes would be to run the the curls(With output meaning): 
-/epochs → curl http://localhost:5000/epochs - Returns entire dataset 
-/epochs?Limit=intsoffset=int →> curl "http://localhost:5000/epochs?limit=10&offset=5" - Returns modified epochs 
-/epochs/<epoch> - curl http://localhost:5000/epochs/2025-084T12:00:00.000z→> Returns State vectors for Epoch in dataset
-/epochs/<epoch>/speed → curl http://localhost:5000/epochs/2025-084T12:00:00.000Z/speed - Returns an instantaenous speed of a specific epoch 
-/epochs/‹epoch>/location → curl http://lpcalhost:5000/epochs/2025-084T12:00:00.000Z/location - Returns the latitude, longtitude, altitude and geoposition of specific epoch 
-/now → curl http://localhost:5001/now --> Returns speed, latitude, longtitude, altitude., geoposition for epoch closest in time when it is ran
+1. /epochs → curl http://localhost:5000/epochs - Returns entire dataset 
+
+2. /epochs -> curl "localhost:5000/epochs?limit=10&offset=5" --> returns values in query parameters
+
+3. curl localhost:5001/epochs/2025-091T16:44:00.000Z
+{
+  "EPOCH": "2025-091T16:44:00.000Z",
+  "X": "-3586.45924627249",
+  "X_DOT": "5.5499239113845702",
+  "Y": "-2541.2077600489001",
+  "Y_DOT": "-5.0896156691459904",
+  "Z": "-5188.9295206555398",
+  "Z_DOT": "-1.3441498894863"
+}
+
+
+
+4. curl localhost:5001/epochs/2025-091T16:44:00.000Z/speed output is "speed": 7.649351737708276
+
+5. curl localhost:5001/epochs/2025-091T16:44:00.000Z/location
+
+output: {
+  "altitude": 429.39825122299135,
+  "geoposition": "Unknown",
+  "latitude": -49.73233120104925,
+  "longitude": -451.1802862767506
+}
+
+
+ 
+6. /now → curl http://localhost:5001/now --> Returns speed, latitude, longtitude, altitude., geoposition for epoch closest in time when it is ran
 
 
 
