@@ -238,20 +238,36 @@ def current_closest_epoch():
         current_time = datetime.now(timezone.utc)
         keys = config.rd.keys("iss:*")
 
-        closest_epoch = min(keys, key=lambda x: abs(datetime.strptime(x.split(':')[1], "%Y-%jT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc) - current_time))
+        epoch = [':'.join(key.split(':')[1:]) for key in keys]
 
-        epoch = closest_epoch.split(':')[1]
-        data_epoch = current_location(epoch)
-        data_speed = speed_epoch(epoch)
+        closest_epoch = min(epoch, key=lambda x: abs(datetime.strptime(x, "%Y-%jT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc) - current_time))
 
-        data_combined = data_epoch.json
-        data_combined.update(data_speed.json)
+        data_epoch_response = current_location(closest_epoch)
+        data_speed_response = speed_epoch(closest_epoch)
 
+        if isinstance(data_epoch_response, tuple):
+            data_epoch = data_epoch_response[0]
+        elif hasattr(data_epoch_response, "get_json"):
+            data_epoch = data_epoch_response.get_json()
+        else:
+            data_epoch = data_epoch_response
+
+        if isinstance(data_speed_response, tuple):
+            data_speed = data_speed_response[0]
+        elif hasattr(data_speed_response, "get_json"):
+            data_speed = data_speed_response.get_json()
+        else:
+            data_speed = data_speed_response
+
+        if not isinstance(data_epoch, dict) or not isinstance(data_speed, dict):
+            raise ValueError("Data returned from current_location or speed_epoch is not a dictionary")
+
+        data_combined = {**data_epoch, **data_speed}
 
         return jsonify(data_combined)
 
-    except Exception as e: 
-        return jsonify({"Error", str(e)})
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 500
 
 if __name__ == '__main__':
     wait_for_redis()
